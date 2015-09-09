@@ -4,6 +4,7 @@ require 'rails/all'
 
 Bundler.require(*Rails.groups)
 require "live_assets"
+require 'pry'
 
 module Dummy
   class Application < Rails::Application
@@ -21,6 +22,11 @@ module Dummy
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    # This is necessary because Rails by default is single-threaded.
+    # According to: http://api.rubyonrails.org/classes/ActionController/Live.html, writing to the
+    # response stream is done on a separate thread.
+    config.allow_concurrency = true
   end
 end
 

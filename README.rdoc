@@ -12,3 +12,19 @@ This project rocks and uses MIT-LICENSE.
     - Low-level, handle tasks such as attaching views to ActionController & ActionMailer
       as soon as they are loaded.
     - Initializers are available by querying `Rails::Engine.initializers`
+
+* Live-streaming is made possible by including the `ActionController::LiveStreaming` functionality.
+  - _Server Sent Events_(SSE), which was included in the HTML5 specification
+  - Enables servers to send events to the client
+  - Each message is delimited as follows:
+
+  ````
+  event: some_channel
+  data: some_data
+  ````
+
+* V1 simply sends an event to the browser using the SSE protocol, and the browser reloads all stylesheets
+* There are 3 things to improve upon V1:
+  1. ######Instead of sending the event every second, only send the event when something changes
+  2. ######Write tests
+  3. ######Understand how enabling concurrency will affect deployment

@@ -1,0 +1,14 @@
+= LiveAssets
+
+This project rocks and uses MIT-LICENSE.
+
+####Notes:
+* Goal is to make a write a Rails plugin that streams data to the browser whenever a stylesheet changes.
+* Leverages Rails engines, which allow plugins to have their own controllers, models, views, and routes.
+* Rails engines use the Paths interface and initializers
+  1. The Paths interface
+    - which allows you to specify where to load controllers, models, etc. from
+  2. Initializers
+    - Low-level, handle tasks such as attaching views to ActionController & ActionMailer
+      as soon as they are loaded.
+    - Initializers are available by querying `Rails::Engine.initializers`

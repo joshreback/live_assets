@@ -3,10 +3,15 @@ require "thread"
 require "listen"
 
 module LiveAssets
-  autoload :SSESubscriber, 'live_assets/sse_subscriber'
+  extend ActiveSupport::Autoload
 
   mattr_reader :subscribers
   @@subscribers = []
+  @@mutex = Mutex.new
+
+  eager_autoload do
+    autoload :SSESubscriber
+  end
 
   def self.unsubscribe_all
     subscribers.clear
@@ -14,13 +19,16 @@ module LiveAssets
 
   # Subscribe to all published events
   def self.subscribe(subscriber)
-    subscribers << subscriber
-    puts "#{subscribers}"
+    @@mutex.synchronize do
+      subscribers << subscriber
+    end
   end
 
   # Unsubscribe an existing subscriber
   def self.unsubscribe(subscriber)
-    subscribers.delete(subscriber)
+    @@mutex.synchronize do
+      subscribers.delete(subscriber)
+    end
   end
 
   # Start a listener for the following directories.

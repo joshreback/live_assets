@@ -45,3 +45,13 @@ This project rocks and uses MIT-LICENSE.
   - This requires we rewrite the controller to use an SSESubscriber that gets notified when an event is added to the queue, it will then write to the stream.
   - Finally, we need to ensure the connection between browser and server won't be closed if there is no activity for long periods by writing a script to ping every 10 seconds.
 
+* Autoloading/concurrency/deployment considerations:
+  - Rails autoloading is not thread-safe
+  - This means that if thread A is loading a controller, and then thread B tries to load the controller, it is possible that thread B will only load a partial implementation of said controller (if thread A had not finished loading it by the time thread B used it).
+  - To solve this, Rails only allows one thread to run at once, which means it can only serve one request at a time.
+
+  How do you handle this limitation in a production environment?
+  - In production, Rails eager-loads all code in the app/ directory, so there is no autoloading to be done.
+  - However, if we're relying on Ruby autoload, we need to eager-load the code ourselves, otherwise we could wind up loading code in the middle of a request.
+  - Thus, we need to make sure anything we want to eager-load using Ruby is done when the application boots.
+

@@ -12,5 +12,7 @@ module LiveAssets
         LiveAssets.start_listener :reloadCSS, paths
       end
     end
+
+    config.eager_load_namespacess << LiveAssets
   end
 end

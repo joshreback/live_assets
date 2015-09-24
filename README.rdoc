@@ -26,5 +26,22 @@ This project rocks and uses MIT-LICENSE.
 * V1 simply sends an event to the browser using the SSE protocol, and the browser reloads all stylesheets
 * There are 3 things to improve upon V1:
   1. ######Instead of sending the event every second, only send the event when something changes
+    - Install the listen gem
+    - In a thread, listen to changes in the filesystem
+    - When changes are detected, push the event out to all of the subscribers
   2. ######Write tests
+    - Decouple the file system watching from the streaming
+    - Setup by subscribing, writing to a file, and then verifying the subscriber got written to
   3. ######Understand how enabling concurrency will affect deployment
+
+* In building out V1, the architecture is as follows:
+  - Start up a listener on initialization to look at
+    `app/assets`, `lib/assets`, and `vendor/assets`
+    Think: 'This is an event subscribers should be notified of'
+  - Every time a request comes in to `live_assets/sse`, create a new subscriber.
+    Think: 'This browser should be notified of this event'
+  - We then wait until an event happens, after which we stream the event to subscribers.
+  - Use a queue to manage this "waiting" behavior; when the queue is empty, the request will go to sleep. When an event arrives, it will wake up and notify the subscribers.
+  - This requires we rewrite the controller to use an SSESubscriber that gets notified when an event is added to the queue, it will then write to the stream.
+  - Finally, we need to ensure the connection between browser and server won't be closed if there is no activity for long periods by writing a script to ping every 10 seconds.
+
